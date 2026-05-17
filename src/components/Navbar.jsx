@@ -5,31 +5,35 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaHeartbeat } from "react-icons/fa";
 import { HiMenuAlt3 } from "react-icons/hi";
+import { toast } from "react-toastify";
+import { authClient } from "@/lib/auth-client"; 
 
 const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Temporary local state for testing UI layouts. 
-  // Comment out this object or set to null to view the unauthenticated guest view.
-  // const user = {
-  //   name: "Sadia",
-  //   email: "sadia@gmail.com",
-  //   photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
-  // };
+  // Fetch real-time session and loading state from Better-Auth
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
 
-  const user = null;
-
-  // Loading state simulation placeholder
-  const isPending = false;
-
-  // Placeholder function for logout action
-  const handleLogout = () => {
-    console.log("Logging out client session...");
-    router.push("/login");
+  // Handle secure user sign-out session destruction
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out server session...");
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Logged out successfully.");
+            router.push("/login");
+          }
+        }
+      });
+    } catch (err) {
+      toast.error("Failed to logout securely.");
+    }
   };
 
-  // Helper function to handle active navigation link states cleanly using solid colors
+  // Helper function to handle active navigation link states
   const isActive = (path) =>
     pathname === path
       ? "bg-blue-50 text-blue-600 font-bold"
@@ -48,6 +52,7 @@ const Navbar = () => {
           All Appointment
         </Link>
       </li>
+      {/* Dashboard link conditionally rendered only for authenticated users */}
       {user && (
         <li>
           <Link href="/dashboard" className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all`}>
@@ -59,7 +64,6 @@ const Navbar = () => {
   );
 
   return (
-    // Replaced outer padding, margin, and rounded-2xl to make the layout full width
     <div className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto navbar px-4 md:px-8 min-h-[72px]">
         
@@ -96,14 +100,14 @@ const Navbar = () => {
           {isPending ? (
             <span className="loading loading-spinner loading-sm text-blue-600"></span>
           ) : user ? (
-            // Authenticated Profile and Logout Interface Block
+            /* Authenticated Profile and Logout Interface View */
             <div className="flex items-center gap-2 md:gap-4">
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-bold text-slate-800 leading-none">{user.name}</p>
               </div>
               <div className="avatar border-2 border-blue-600 rounded-full p-0.5">
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-full overflow-hidden">
-                  <img alt={user.name} src={user.photo || "https://i.ibb.co/mR79Y6B/user-placeholder.png"} />
+                  <img alt={user.name} src={user.image || "https://i.ibb.co/mR79Y6B/user-placeholder.png"} />
                 </div>
               </div>
 
@@ -115,7 +119,7 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
-            // Unauthenticated Guest Login / Signup Interface Block
+            /* Unauthenticated Guest Interface View */
             <div className="flex gap-2">
               <Link href="/login" className="btn btn-sm md:btn-md text-blue-600 font-bold bg-slate-100 border-none rounded-xl px-4 md:px-6 hover:bg-slate-200 transition-colors">
                 Login
