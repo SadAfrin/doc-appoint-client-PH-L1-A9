@@ -15,12 +15,12 @@ export const auth = betterAuth({
     requireEmailVerification: false, // Set to true in production for better security
   },
 
-//   socialProviders: {
-//     google: {
-//       clientId: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//     },
-//   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    },
+  },
 
   // Database adapter
   database: mongodbAdapter(db, {

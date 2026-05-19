@@ -95,7 +95,7 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Right Side Section: Authentication Controls */}
+        {/* Right Side Section */}
         <div className="navbar-end gap-3">
           {isPending ? (
             <span className="loading loading-spinner loading-sm text-blue-600"></span>

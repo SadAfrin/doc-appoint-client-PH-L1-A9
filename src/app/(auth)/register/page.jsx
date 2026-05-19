@@ -21,7 +21,7 @@ const RegisterContent = () => {
     const formData = new FormData(event.target);
     const userData = Object.fromEntries(formData.entries());
 
-    // Password Validation Rules Enforcement (Using your exact logic structure)
+    // Password Validation Rules Enforcement 
     const password = userData.password;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
@@ -43,12 +43,12 @@ const RegisterContent = () => {
       return;
     }
 
-    // Direct Integration with your Better-Auth code chunk
+    // Direct Better-Auth code
     const { data, error } = await authClient.signUp.email({
       name: userData.name, 
       email: userData.email, 
       password: userData.password, 
-      image: userData.photoUrl, // Maps to your inputs name="photoUrl"
+      image: userData.photoUrl, 
       callbackURL: "/login", 
     });
     await authClient.signOut();
@@ -77,7 +77,7 @@ const RegisterContent = () => {
   return (
     <div className="max-w-md w-full bg-blue-50/50 p-8 rounded-3xl shadow-xl border border-blue-100/60 animate__animated animate__fadeInDown">
       
-      {/* Brand/Header Section */}
+      {/* Header Section */}
       <div className="text-center mb-6 flex flex-col items-center">
         <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-md shadow-blue-600/10 mb-3">
           <FaHeartbeat size={26} />
@@ -157,7 +157,7 @@ const RegisterContent = () => {
           </div>
         </div>
 
-        {/* Register Action Submission Button */}
+        {/* Register Button */}
         <button
           type="submit"
           disabled={loading}
@@ -169,7 +169,7 @@ const RegisterContent = () => {
 
       <div className="divider text-slate-400/80 my-5 text-[10px] font-bold uppercase tracking-widest">Or Register With</div>
 
-      {/* Google Login Handler Target */}
+      {/* Google Login Handler*/}
       <button
         type="button"
         onClick={handleGoogleLogin}

@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { FcGoogle } from "react-icons/fc";
 import { HiMail, HiLockClosed } from "react-icons/hi";
 import { FaHeartbeat } from "react-icons/fa";
-// Importing the exact authClient instance from your client configuration file
 import { authClient } from "@/lib/auth-client"; 
 
 const LoginContent = () => {
@@ -18,7 +17,7 @@ const LoginContent = () => {
   // Safely grab callback URL dynamically or default to root home directory
   const redirectTo = searchParams ? searchParams.get("callbackUrl") || "/" : "/";
 
-  // Your requested exact Email login handler implementation
+  // Email login handler implementation
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -31,7 +30,7 @@ const LoginContent = () => {
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: redirectTo, // Dynamically using the redirection path
+        callbackURL: redirectTo, //above
       });
 
       if (error) {
@@ -48,12 +47,12 @@ const LoginContent = () => {
     }
   };
 
-  // Your requested exact Google login handler implementation using Better-Auth social infrastructure
+  // Google login handler implementation using Better-Auth social infrastructure
   const handleGoogleLogin = async () => {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: redirectTo, // Directs back to the same requested route after OAuth handshake
+        callbackURL: redirectTo, 
       });
     } catch (err) {
       toast.error("Google Authentication Failed");
@@ -63,7 +62,7 @@ const LoginContent = () => {
   return (
     <div className="max-w-md w-full bg-blue-50/50 p-8 rounded-3xl shadow-xl border border-blue-100/60 animate__animated animate__fadeInDown">
       
-      {/* Brand/Header Section */}
+      {/* Header Section */}
       <div className="text-center mb-8 flex flex-col items-center">
         <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-md shadow-blue-600/10 mb-3">
           <FaHeartbeat size={26} />
@@ -112,7 +111,7 @@ const LoginContent = () => {
           </div>
         </div>
 
-        {/* Form Submission Action trigger */}
+        {/* Form Submission */}
         <button 
           type="submit"
           disabled={loading} 
@@ -141,7 +140,7 @@ const LoginContent = () => {
   );
 };
 
-// Main Export Component wrapped inside Suspense fallback layer to support search params compilation safely
+// Main Export Component for Login Page
 const LoginPage = () => {
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50">
