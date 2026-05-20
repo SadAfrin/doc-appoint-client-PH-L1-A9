@@ -33,7 +33,7 @@ const Navbar = () => {
     }
   };
 
-  // Helper function to handle active navigation link states
+  // Helper function to handle active navigation link states cleanly
   const isActive = (path) =>
     pathname === path
       ? "bg-blue-50 text-blue-600 font-bold"
@@ -52,14 +52,27 @@ const Navbar = () => {
           All Appointments
         </Link>
       </li>
-      {/* Dashboard link conditionally rendered only for authenticated users */}
-      {user && (
-        <li>
-          <Link href="/dashboard" className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all`}>
+      
+      {/* Dashboard Link */}
+      <li>
+        {session?.user ? (
+          // 1. Redirect to Dashboard if session token is actively resolved
+          <Link 
+            href="/dashboard" 
+            className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all block`}
+          >
             Dashboard
           </Link>
-        </li>
-      )}
+        ) : (
+          // 2. Fallback routing pointing unauthenticated layout targets safely to login setup
+          <Link 
+            href="/login" 
+            className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all block`}
+          >
+            Dashboard
+          </Link>
+        )}
+      </li>
     </>
   );
 
