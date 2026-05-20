@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
@@ -14,8 +14,18 @@ const LoginContent = () => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
+  // Fetch real-time session state to prevent dual screen render bugs
+  const { data: session, isPending } = authClient.useSession();
+
   // Safely grab callback URL dynamically or default to root home directory
   const redirectTo = searchParams ? searchParams.get("callbackUrl") || "/" : "/";
+
+  // Redirect automatically if user session actively exists
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      router.push(redirectTo);
+    }
+  }, [session, isPending, router, redirectTo]);
 
   // Email login handler implementation
   const handleLogin = async (e) => {
@@ -38,7 +48,8 @@ const LoginContent = () => {
       } else {
         toast.success("Welcome back! Login Successful.");
         form.reset();
-        router.push(redirectTo); 
+        // router.push(redirectTo); 
+        window.location.href = redirectTo;
       }
     } catch (err) {
       toast.error("Database connection error");

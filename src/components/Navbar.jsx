@@ -55,21 +55,12 @@ const Navbar = () => {
       
       {/* Dashboard Link */}
       <li>
-        {session?.user ? (
-          // 1. Redirect to Dashboard if session token is actively resolved
+        {user && (
           <Link 
             href="/dashboard" 
             className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all block`}
           >
-            Dashboard
-          </Link>
-        ) : (
-          // 2. Fallback routing pointing unauthenticated layout targets safely to login setup
-          <Link 
-            href="/login" 
-            className={`${isActive("/dashboard")} px-6 py-2 rounded-xl transition-all block`}
-          >
-            Dashboard
+            {user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ? "Admin Dashboard" : "Dashboard"}
           </Link>
         )}
       </li>
