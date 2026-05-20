@@ -33,7 +33,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#eef6fc] p-4 sm:p-10 text-slate-800">
+    <div className="min-h-screen bg-indigo-100 p-4 sm:p-10 text-slate-800">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header Title */}
@@ -48,9 +48,9 @@ const DashboardPage = () => {
         </div>
 
         {/* Clean White Panel Frame */}
-        <div className="bg-white/90 backdrop-blur-md border border-blue-100 rounded-3xl p-6 sm:p-8 shadow-xl shadow-blue-900/[0.03] flex flex-col md:flex-row items-center gap-6 justify-between relative overflow-hidden">
+        {/* <div className="bg-white/90 backdrop-blur-md border border-blue-100 rounded-3xl p-6 sm:p-8 shadow-xl shadow-blue-900/[0.03] flex flex-col md:flex-row items-center gap-6 justify-between relative overflow-hidden"> */}
           
-          {/* Left Side: Picture & Info */}
+          {/* Left Side: Picture & Info
           <div className="flex items-center flex-col sm:flex-row text-center sm:text-left gap-5 z-10">
             <div className="w-24 h-24 rounded-full border-4 border-blue-600 p-1 bg-white shadow-md flex items-center justify-center overflow-hidden">
               <img 
@@ -71,9 +71,9 @@ const DashboardPage = () => {
               </div>
               
             </div>
-          </div>
+          </div> */}
 
-          {/* Right Side: Buttons Toggle Controller */}
+          {/* Buttons Toggle Controller */}
           <div className="flex items-center gap-3 w-full md:w-auto border-t border-slate-100 md:border-t-0 pt-4 md:pt-0 justify-center z-10">
             <button 
               onClick={() => setActiveTab("bookings")}
@@ -97,7 +97,7 @@ const DashboardPage = () => {
             </button>
           </div>
 
-        </div>
+        {/* </div> */}
 
         {/* Dynamic Component Switching View Area */}
         <div className="transition-all duration-300">
