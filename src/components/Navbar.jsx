@@ -49,7 +49,7 @@ const Navbar = () => {
       </li>
       <li>
         <Link href="/appointments" className={`${isActive("/appointments")} px-6 py-2 rounded-xl transition-all`}>
-          All Appointment
+          All Appointments
         </Link>
       </li>
       {/* Dashboard link conditionally rendered only for authenticated users */}
