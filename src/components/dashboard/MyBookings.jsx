@@ -6,15 +6,19 @@ import { toast } from "react-toastify";
 const MyBookings = ({ user }) => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Modal toggle states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  
+  // Data pointers for targeted mutations
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [bookingIdToDelete, setBookingIdToDelete] = useState(null);
 
-  // Fetch bookings from backend filtered by logged-in user's email
   const fetchBookings = useCallback(async () => {
     if (!user?.email) return;
     try {
       setIsLoading(true);
-      // Calls the Express GET route using the user's email as a query parameter
       const res = await fetch(`http://localhost:5000/api/bookings?email=${user.email}`);
       const data = await res.json();
       
@@ -26,37 +30,43 @@ const MyBookings = ({ user }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.email]);
+  }, [user]);
 
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Handle appointment deletion
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+  // Stage target configuration for state deletion confirmation
+  const triggerCancelConfirmation = (id) => {
+    setBookingIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!bookingIdToDelete) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingIdToDelete}`, {
         method: "DELETE",
       });
       const data = await res.json();
 
       if (data.success) {
-        setBookings((prev) => prev.filter((item) => item._id !== id));
+        setBookings((prev) => prev.filter((item) => item._id !== bookingIdToDelete));
         toast.success("Appointment canceled successfully.");
       }
     } catch (err) {
       toast.error("Failed to delete appointment.");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setBookingIdToDelete(null);
     }
   };
 
   const openEditModal = (booking) => {
     setSelectedBooking({ ...booking });
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
-  // Handle appointment data update
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -71,7 +81,7 @@ const MyBookings = ({ user }) => {
         setBookings((prev) =>
           prev.map((item) => (item._id === selectedBooking._id ? selectedBooking : item))
         );
-        setIsModalOpen(false);
+        setIsEditModalOpen(false);
         toast.success("Appointment updated successfully.");
       }
     } catch (err) {
@@ -94,7 +104,7 @@ const MyBookings = ({ user }) => {
         </div>
       ) : bookings.length === 0 ? (
         <div className="text-center p-16 bg-white rounded-3xl border border-blue-50/80 shadow-md">
-          <p className="text-slate-500 font-medium">No scheduled appointments found.</p>
+          <p className="text-slate-500 font-medium">No scheduled appointments found on your account.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -141,10 +151,10 @@ const MyBookings = ({ user }) => {
                   Update
                 </button>
                 <button 
-                  onClick={() => handleDelete(booking._id)}
+                  onClick={() => triggerCancelConfirmation(booking._id)}
                   className="flex-1 lg:flex-initial bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white px-5 py-2.5 rounded-xl font-bold text-sm border border-rose-100 transition-all text-center"
                 >
-                  Cancel
+                  Delete
                 </button>
               </div>
             </div>
@@ -152,8 +162,42 @@ const MyBookings = ({ user }) => {
         </div>
       )}
 
-      {/* Update Booking Modal Overlay */}
-      {isModalOpen && selectedBooking && (
+      {/* Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-blue-50 animate-in fade-in zoom-in-95 duration-200 space-y-4">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center mx-auto text-rose-600 text-xl font-black">
+                !
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900">Cancel Appointment</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Are you to delete this appointment? This action cannot be undone.
+              </p>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <button 
+                type="button" 
+                onClick={() => setIsDeleteModalOpen(false)} 
+                className="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-700 text-sm text-center hover:bg-slate-200 transition-colors"
+              >
+                No, Keep it
+              </button>
+              <button 
+                type="button" 
+                onClick={handleConfirmDelete} 
+                className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-extrabold text-sm text-center hover:bg-rose-700 transition-colors shadow-sm"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Booking Modal */}
+      {isEditModalOpen && selectedBooking && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-blue-50 animate-in fade-in zoom-in-95 duration-200">
             <div className="bg-blue-600 p-6 text-white flex justify-between items-center">
@@ -162,7 +206,7 @@ const MyBookings = ({ user }) => {
                 <p className="text-xs text-blue-100 mt-0.5">Modify the existing patient or schedule info</p>
               </div>
               <button 
-                onClick={() => setIsModalOpen(false)} 
+                onClick={() => setIsEditModalOpen(false)} 
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center font-bold text-sm"
               >
                 ✕
@@ -206,7 +250,7 @@ const MyBookings = ({ user }) => {
               </div>
 
               <div className="flex gap-3 pt-4 border-t border-slate-100">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-700 text-center hover:bg-slate-200 transition-colors">Cancel</button>
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-700 text-center hover:bg-slate-200 transition-colors">Cancel</button>
                 <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-extrabold text-center hover:bg-blue-700 transition-colors shadow-md">Save Changes</button>
               </div>
             </form>
