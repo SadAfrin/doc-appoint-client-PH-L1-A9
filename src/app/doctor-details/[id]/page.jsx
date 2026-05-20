@@ -123,7 +123,7 @@ const DoctorDetails = () => {
                 {doctor.name}
               </h1>
               <p className="text-sm font-medium text-blue-600 mt-1">
-                {doctor.degrees || "MBBS, Specialist"}
+                {doctor.degrees}
               </p>
               
               {/* Core Information */}

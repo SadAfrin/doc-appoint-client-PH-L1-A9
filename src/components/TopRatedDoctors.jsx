@@ -1,12 +1,63 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import DoctorCard from "./DoctorCard";
 
 const TopRatedDoctors = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/doctors");
+        const result = await res.json(); 
+
+        const doctorsArray = result.data; 
+
+        const topDoctors = doctorsArray
+          .sort((a, b) => parseInt(b.experience) - parseInt(a.experience))
+          .slice(0, 3);
+
+        setDoctors(topDoctors);
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16">
+        <div className="text-center">Loading top doctors...</div>
+      </section>
+    );
+  }
+
   return (
-    <div>
-      <h2 className="text-2xl font-bold">Top Rated Doctors Section</h2>
-    </div>
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900">Top Rated Doctors</h2>
+          <p className="text-gray-600 mt-2">Discover our most experienced specialists</p>
+        </div>
+
+        {/* Doctors Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {doctors.map((doctor) => (
+            <DoctorCard 
+              key={doctor._id} 
+              doctor={doctor} 
+              onViewDetails={(id) => window.location.href = `/doctor-details/${id}`} 
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
