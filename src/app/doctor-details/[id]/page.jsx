@@ -52,7 +52,7 @@ const DoctorDetails = () => {
 
   // Navigate to the separate dedicated dynamic booking page route
   const handleBookingRedirect = () => {
-    router.push(`/doctor-details/${id}/book`);
+    router.push(`/doctor-details/${id}/booking-appointment`);
   };
 
   // Safeguard view structure if the targeted doctor is not found
