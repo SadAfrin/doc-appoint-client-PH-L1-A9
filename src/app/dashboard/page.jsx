@@ -77,7 +77,7 @@ const DashboardPage = () => {
           <div className="flex items-center gap-3 w-full md:w-auto border-t border-slate-100 md:border-t-0 pt-4 md:pt-0 justify-center z-10">
             <button 
               onClick={() => setActiveTab("bookings")}
-              className={`px-6 py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all duration-200 min-w-[130px] border ${
+              className={`px-6 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all duration-200 min-w-[130px] border ${
                 activeTab === "bookings" 
                   ? "bg-blue-600 text-white border-blue-600 shadow-blue-500/20 shadow-md transform scale-[1.01]" 
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
@@ -87,7 +87,7 @@ const DashboardPage = () => {
             </button>
             <button 
               onClick={() => setActiveTab("profile")}
-              className={`px-6 py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all duration-200 min-w-[130px] border ${
+              className={`px-6 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all duration-200 min-w-[130px] border ${
                 activeTab === "profile" 
                   ? "bg-blue-600 text-white border-blue-600 shadow-blue-500/20 shadow-md transform scale-[1.01]" 
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
