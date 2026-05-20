@@ -1,81 +1,111 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-
-// Mock data array simulating database documents
-const mockDoctors = [
-  {
-    id: "1",
-    doctorName: "Dr. Ariful Islam",
-    specialty: "Cardiologist",
-    hospital: "Dhaka Medical College Hospital",
-    availableTime: "Sat - Mon (5:00 PM - 8:00 PM)",
-    fee: "1000 BDT",
-    experience: "12+ Years",
-    degrees: "MBBS, FCPS (Cardiology), MD",
-    about: "Dr. Ariful Islam is a highly accomplished cardiologist dedicated to delivering comprehensive cardiovascular care. With over a decade of clinical experience, he specializes in interventional cardiology and preventive heart care treatments.",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    doctorName: "Dr. Nusrat Jahan",
-    specialty: "Gynecologist",
-    hospital: "Square Hospital",
-    availableTime: "Sun - Wed (3:00 PM - 6:00 PM)",
-    fee: "1200 BDT",
-    experience: "10 Years",
-    degrees: "MBBS, MS (OBGYN), DGO",
-    about: "Dr. Nusrat Jahan is an experienced specialist in women's reproductive health, prenatal care, and complex maternal-fetal medicine. She is widely recognized for her compassionate approach to patient care.",
-    image: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    doctorName: "Dr. Tanvir Rahman",
-    specialty: "Pediatrician",
-    hospital: "Evercare Hospital",
-    availableTime: "Tue - Thu (6:00 PM - 9:00 PM)",
-    fee: "800 BDT",
-    experience: "8 Years",
-    degrees: "MBBS, MD (Pediatrics)",
-    about: "Dr. Tanvir Rahman specializes in newborn care, childhood development assessment, and managing pediatric chronic health syndromes. He provides a welcoming environment for children and parents alike.",
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=600&auto=format&fit=crop",
-  },
-];
+import { toast } from "react-toastify";
 
 const DoctorDetails = () => {
   const { id } = useParams();
   const router = useRouter();
 
-  // Find the specific doctor document corresponding to the URL dynamic segment ID
-  const doctor = mockDoctors.find((doc) => doc.id === id);
+  // State management for a single doctor
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Core hook fetching specific doctor document corresponding to the URL parameter ID
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/doctors/${id}`);
+        const result = await res.json();
+
+        if (result.success && result.data) {
+          setDoctor(result.data);
+        } else {
+          toast.error("Doctor profile records not found.");
+        }
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        toast.error("Failed to connect with core profile registry database server");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchDoctorDetails();
+    }
+  }, [id]);
 
   // Navigate to the separate dedicated dynamic booking page route
   const handleBookingRedirect = () => {
     router.push(`/doctor-details/${id}/booking-appointment`);
   };
 
-  // Safeguard view structure if the targeted doctor is not found
-  if (!doctor) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-800">Doctor Profile Not Found</h2>
+        <span className="loading loading-spinner loading-lg text-blue-600"></span>
       </div>
     );
   }
+
+
+  // if the targeted doctor is not found 
+  if (!doctor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center">
+          //alert icon
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+
+          {/* Error Message */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Doctor Profile Not Found
+          </h2>
+          <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+            The doctor profile registry record you are trying to access is unavailable or the link contains an invalid security ID segment.
+          </p>
+
+          {/* Action Button to Return */}
+          <button
+            onClick={() => router.push("/appointments")}
+            className="w-full inline-flex justify-center items-center px-6 py-3 text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors duration-200"
+          >
+            Return to Doctors
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // ----------------------------------------------------
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         
-        {/* Main Content Responsive Layout Split */}
+        {/* Responsive Layout Split */}
         <div className="flex flex-col md:flex-row">
           
           {/* Doctor Image Block */}
           <div className="md:w-2/5 h-80 md:h-auto relative bg-gray-100">
             <img
               src={doctor.image}
-              alt={doctor.doctorName}
+              alt={doctor.name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -90,18 +120,28 @@ const DoctorDetails = () => {
               
               {/* Doctor Header Info */}
               <h1 className="text-3xl font-bold text-gray-900 mt-3">
-                {doctor.doctorName}
+                {doctor.name}
               </h1>
-              <p className="text-sm font-medium text-blue-600 mt-1">{doctor.degrees}</p>
+              <p className="text-sm font-medium text-blue-600 mt-1">
+                {doctor.degrees || "MBBS, Specialist"}
+              </p>
               
-              {/* Core Information Metrics */}
+              {/* Core Information */}
               <div className="mt-4 space-y-2 text-sm text-gray-600">
-                <p><span className="font-semibold text-gray-800">Hospital:</span> {doctor.hospital}</p>
-                <p><span className="font-semibold text-gray-800">Experience:</span> {doctor.experience}</p>
-                <p><span className="font-semibold text-gray-800">Visiting Hours:</span> {doctor.availableTime}</p>
+                <p>
+                  <span className="font-semibold text-gray-800">Hospital:</span> {doctor.hospital}
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-800">Experience:</span>{" "}
+                  {doctor.experience?.toString().includes("year") ? doctor.experience : `${doctor.experience} Years`}
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-800">Visiting Hours:</span>{" "}
+                  {Array.isArray(doctor.availability) ? doctor.availability.join(", ") : doctor.availability}
+                </p>
                 <p>
                   <span className="font-semibold text-gray-800">Consultation Fee:</span>{" "}
-                  <span className="text-gray-900 font-bold text-base">{doctor.fee}</span>
+                  <span className="text-gray-900 font-bold text-base">{doctor.fee} BDT</span>
                 </p>
               </div>
 
@@ -109,7 +149,7 @@ const DoctorDetails = () => {
               <div className="mt-6 pt-6 border-t border-gray-100">
                 <h3 className="text-md font-bold text-gray-900 mb-2">About Doctor</h3>
                 <p className="text-sm text-gray-500 leading-relaxed font-normal">
-                  {doctor.about}
+                  {doctor.description || "No specific background description has been added yet."}
                 </p>
               </div>
             </div>

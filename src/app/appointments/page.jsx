@@ -1,45 +1,45 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client"; // Better-Auth client instance
-
-// Mock data representing available medical appointments
-const dummyAppointments = [
-  {
-    id: "1",
-    doctorName: "Dr. Ariful Islam",
-    specialty: "Cardiologist",
-    hospital: "Dhaka Medical College Hospital",
-    availableTime: "Sat - Mon (5:00 PM - 8:00 PM)",
-    fee: "1000 BDT",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    doctorName: "Dr. Nusrat Jahan",
-    specialty: "Gynecologist",
-    hospital: "Square Hospital",
-    availableTime: "Sun - Wed (3:00 PM - 6:00 PM)",
-    fee: "1200 BDT",
-    image: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    doctorName: "Dr. Tanvir Rahman",
-    specialty: "Pediatrician",
-    hospital: "Evercare Hospital",
-    availableTime: "Tue - Thu (6:00 PM - 9:00 PM)",
-    fee: "800 BDT",
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=400&auto=format&fit=crop",
-  },
-];
+import { toast } from "react-toastify";
+import DoctorCard from "@/components/DoctorCard";
 
 const AllAppointments = () => {
   const router = useRouter();
   
   // Track user authentication status using Better-Auth hook
   const { data: session, isPending } = authClient.useSession();
+
+  // State management for raw fetched core data from endpoint registry
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Core hook fetching integrated doctors dataset list on mount
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/doctors");
+        const allDoctors = await res.json();
+        
+        // Base validations structured strictly around 'allDoctors' variable response
+        if (allDoctors.success || Array.isArray(allDoctors)) {
+          // Fallback parsing extracting 'allDoctors.data' object array dynamically
+          setDoctors(Array.isArray(allDoctors) ? allDoctors : allDoctors.data || []);
+        } else {
+          toast.error("Failed to parse system doctor records properly.");
+        }
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        toast.error("Network connection error to core backend infrastructure server");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   // Handle conditional navigation based on user session status
   const handleViewDetails = (doctorId) => {
@@ -54,6 +54,14 @@ const AllAppointments = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <span className="loading loading-spinner loading-lg text-blue-600"></span>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -67,61 +75,23 @@ const AllAppointments = () => {
           </p>
         </div>
 
-        {/* Responsive Grid Layout for Appointment Cards */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {dummyAppointments.map((appointment) => (
-            <div
-              key={appointment.id}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col"
-            >
-              {/* Cover Image Container */}
-              <div className="relative h-48 w-full bg-gray-200">
-                <img
-                  src={appointment.image}
-                  alt={appointment.doctorName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Card Details Content */}
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
-                    {appointment.specialty}
-                  </span>
-                  <h3 className="mt-3 text-xl font-bold text-gray-900">
-                    {appointment.doctorName}
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500 font-medium">
-                    {appointment.hospital}
-                  </p>
-
-                  {/* Schedule and Pricing Info */}
-                  <div className="mt-4 space-y-2 border-t border-gray-50 pt-4">
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <span className="font-semibold text-gray-800 mr-1">Time:</span>{" "}
-                      {appointment.availableTime}
-                    </p>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <span className="font-semibold text-gray-800 mr-1">Fee:</span>{" "}
-                      {appointment.fee}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Call To Action Button */}
-                <div className="mt-6">
-                  <button
-                    onClick={() => handleViewDetails(appointment.id)}
-                    className="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Dynamic Empty Layout Validation Guard */}
+        {doctors.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100 max-w-md mx-auto">
+            <p className="text-gray-500 font-medium">No doctors are registered yet!</p>
+          </div>
+        ) : (
+          /* Responsive Grid Layout for Appointment Cards */
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {doctors.map((doctor) => (
+              <DoctorCard
+                key={doctor._id || doctor.id}
+                doctor={doctor}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
