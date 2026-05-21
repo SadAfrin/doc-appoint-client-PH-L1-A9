@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { fetchProtected } from "@/lib/api"; //for jwt
 
 const BookingAppointmentPage = () => {
   const { id } = useParams();
@@ -12,7 +11,6 @@ const BookingAppointmentPage = () => {
   const { data: session } = authClient.useSession();
   const userEmail = session?.user?.email || "Not logged in";
 
-  // State management for doctor data, form fields, and UI feedback
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [patientName, setPatientName] = useState("");
@@ -23,11 +21,19 @@ const BookingAppointmentPage = () => {
   const [timeError, setTimeError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Fetch doctor data on component mount
   useEffect(() => {
     const fetchDoctor = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/doctors/${id}`);
+        const { data: tokenData } = await authClient.token();
+        console.log(tokenData);
+
+        const res = await fetch(`${process.env.SERVER_URL}/api/doctors/${id}`, {
+          headers: {
+            authorization: `Bearer ${tokenData?.token}`,
+            "Content-Type": "application/json"
+          },
+        
+        });
         const data = await res.json();
         if (data.success) {
           setDoctor(data.data);
@@ -41,7 +47,6 @@ const BookingAppointmentPage = () => {
     fetchDoctor();
   }, [id]);
 
-  // Utility to convert time string (e.g., "10:30 AM") to total minutes from midnight
   const convertToMinutes = (timeStr) => {
     const [time, modifier] = timeStr.trim().split(" ");
     let [hours, minutes] = time.split(":").map(Number);
@@ -50,7 +55,6 @@ const BookingAppointmentPage = () => {
     return hours * 60 + minutes;
   };
 
-  // Validate if the chosen time falls within the doctor's availability slots
   const validateTimeSlot = (inputTimeStr) => {
     try {
       const inputMinutes = convertToMinutes(inputTimeStr);
@@ -74,20 +78,27 @@ const BookingAppointmentPage = () => {
       return;
     }
 
-    const bookingPayload = {
-      userEmail,
-      doctorName: doctor.name,
-      patientName,
-      gender,
-      phone,
-      appointmentDate,
-      appointmentTime,
-    };
-
     try {
-      const res = await fetchProtected("http://localhost:5000/api/bookings", {
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
+
+      const bookingPayload = {
+        userEmail,
+        doctorName: doctor.name,
+        patientName,
+        gender,
+        phone,
+        appointmentDate,
+        appointmentTime,
+      };
+
+      const res = await fetch(`${process.env.SERVER_URL}/api/bookings`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${tokenData?.token}`
+        },
+        credentials: "include",
         body: JSON.stringify(bookingPayload),
       });
 

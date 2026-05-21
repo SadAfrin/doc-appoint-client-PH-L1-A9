@@ -10,7 +10,7 @@ const TopRatedDoctors = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/doctors");
+        const res = await fetch(`${process.env.SERVER_URL}/api/doctors`);
         const result = await res.json(); 
 
         const doctorsArray = result.data; 

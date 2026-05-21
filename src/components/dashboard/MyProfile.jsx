@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
-import { fetchProtected } from "@/lib/api"; //for jwt
 
 const UserProfile = () => {
   const { data: session } = authClient.useSession();
@@ -22,21 +21,34 @@ const UserProfile = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
+
     try {
-      setIsSaving(true);
-      const res = await fetchProtected("http://localhost:5000/api/users/update-profile", {
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
+
+      // if (!tokenData?.token) {
+      //     console.error("Token missing, request aborted");
+      //     return; 
+      // }
+
+      const res = await fetch(`${process.env.SERVER_URL}/api/users/update-profile`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${tokenData?.token}`
+        },
+        // credentials: "include",
         body: JSON.stringify({
           email: user.email,
           name: formData.name,
           image: formData.image
         }),
       });
+
       const data = await res.json();
 
-      if (data.success) {
-        /* Forces Better-Auth client context sync to dynamically re-render Navbar avatars without hard reloading */
+      if (res.ok) {
         await authClient.updateUser({
           name: formData.name,
           image: formData.image
@@ -44,6 +56,8 @@ const UserProfile = () => {
 
         setIsModalOpen(false);
         toast.success("Profile updated successfully!");
+      } else {
+        toast.error(data.message || "Failed to update profile.");
       }
     } catch (err) {
       toast.error("Failed to update profile.");

@@ -3,13 +3,11 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
-import { fetchProtected } from "@/lib/api"; //for jwt
 
 const AddDoctor = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  // Form input states alignment based on doctor data fields
   const [name, setName] = useState("");
   const [specialty, setSpecialty] = useState("General Physician");
   const [image, setImage] = useState("");
@@ -18,14 +16,10 @@ const AddDoctor = () => {
   const [location, setLocation] = useState("");
   const [fee, setFee] = useState("");
   const [description, setDescription] = useState("");
-
-  // Handling multi-slot arrays for doctor clinical availability
   const [slots, setSlots] = useState([]);
   const [currentSlot, setCurrentSlot] = useState("");
-
   const [loading, setLoading] = useState(false);
 
-  // Quick list for specialty dropdown selection
   const specialties = [
     "General Physician",
     "Cardiologist",
@@ -35,7 +29,6 @@ const AddDoctor = () => {
     "Orthopedic",
   ];
 
-  // Helper function to dynamically add time slots into state array
   const handleAddSlot = (e) => {
     e.preventDefault();
     if (!currentSlot.trim()) return;
@@ -49,12 +42,10 @@ const AddDoctor = () => {
     setCurrentSlot("");
   };
 
-  // Helper function to remove a time slot from state array
   const handleRemoveSlot = (indexToRemove) => {
     setSlots(slots.filter((_, index) => index !== indexToRemove));
   };
 
-  // Handle ultimate form submit payload to express server backend node
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,16 +54,18 @@ const AddDoctor = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
-      setLoading(false);
-      setLoading(true);
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
 
       const payload = {
         adminEmail: user?.email || process.env.NEXT_PUBLIC_ADMIN_EMAIL,
         doctorData: {
           name,
           specialty,
-          image: image || "https://i.ibb.co/mR79Y6B/user-placeholder.png", // safe fallback layout logic
+          image: image || "https://i.ibb.co/mR79Y6B/user-placeholder.png",
           experience: `${experience} years`,
           availability: slots,
           description,
@@ -82,11 +75,13 @@ const AddDoctor = () => {
         },
       };
 
-      const res = await fetchProtected("http://localhost:5000/api/doctors/add", {
+      const res = await fetch(`${process.env.SERVER_URL}/api/doctors/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          authorization: `Bearer ${tokenData?.token}` 
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -94,7 +89,6 @@ const AddDoctor = () => {
 
       if (data.success) {
         toast.success("Doctor added to the panel successfully!");
-        // Clear all form records smoothly
         setName("");
         setSpecialty("General Physician");
         setImage("");
@@ -114,7 +108,7 @@ const AddDoctor = () => {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-xl shadow-blue-900/[0.02] w-full">
       <div className="mb-6 text-left">
@@ -124,7 +118,7 @@ const AddDoctor = () => {
 
       <form onSubmit={handleSubmit} className="space-y-5 text-left">
         
-        {/* Row 1: Name and Specialty */}
+        {/* Name and Specialty */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="form-control w-full">
             <label className="label py-1"><span className="label-text text-xs font-bold text-slate-600">Doctor Full Name *</span></label>
@@ -151,7 +145,7 @@ const AddDoctor = () => {
           </div>
         </div>
 
-        {/* Row 2: Image URL and Years of Experience */}
+        {/* Image URL and Years of Experience */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="form-control w-full">
             <label className="label py-1"><span className="label-text text-xs font-bold text-slate-600">Doctor Profile Image URL</span></label>
@@ -176,7 +170,7 @@ const AddDoctor = () => {
           </div>
         </div>
 
-        {/* Row 3: Hospital Name and Consultation Fee */}
+        {/* Hospital Name and Consultation Fee */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="form-control w-full">
             <label className="label py-1"><span className="label-text text-xs font-bold text-slate-600">Affiliated Hospital *</span></label>
@@ -201,7 +195,7 @@ const AddDoctor = () => {
           </div>
         </div>
 
-        {/* Row 4: Location Mapping */}
+        {/* Location Mapping */}
         <div className="form-control w-full">
           <label className="label py-1"><span className="label-text text-xs font-bold text-slate-600">Chamber Location *</span></label>
           <input 
@@ -213,7 +207,7 @@ const AddDoctor = () => {
           />
         </div>
 
-        {/* Row 5: Time Slots Generator Array Widget */}
+        {/* Time Slots Generator Array Widget */}
         <div className="form-control w-full bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl p-4 space-y-3">
           <label className="block text-xs font-bold text-slate-600">Manage Availability Time Slots *</label>
           
@@ -254,7 +248,7 @@ const AddDoctor = () => {
           </div>
         </div>
 
-        {/* Row 6: Description */}
+        {/* Description */}
         <div className="form-control w-full">
           <label className="label py-1"><span className="label-text text-xs font-bold text-slate-600">Doctor Professional Profile Summary</span></label>
           <textarea 

@@ -3,23 +3,28 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { fetchProtected } from "@/lib/api"; //for jwt
-
-
+import { authClient } from "@/lib/auth-client";
 
 const DoctorDetails = () => {
   const { id } = useParams();
   const router = useRouter();
 
-  // State management for a single doctor
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Core hook fetching specific doctor document corresponding to the URL parameter ID
   useEffect(() => {
     const fetchDoctorDetails = async () => {
       try {
-        const res = await fetchProtected(`http://localhost:5000/api/doctors/${id}`);
+        const { data: tokenData } = await authClient.token();
+        console.log(tokenData);
+
+        const res = await fetch(`${process.env.SERVER_URL}/api/doctors/${id}`, {
+          headers: {
+            authorization: `Bearer ${tokenData?.token}`,
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+        });
         const result = await res.json();
 
         if (result.success && result.data) {
@@ -40,7 +45,6 @@ const DoctorDetails = () => {
     }
   }, [id]);
 
-  // Navigate to the separate dedicated dynamic booking page route
   const handleBookingRedirect = () => {
     router.push(`/doctor-details/${id}/booking-appointment`);
   };

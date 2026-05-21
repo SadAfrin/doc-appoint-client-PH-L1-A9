@@ -22,7 +22,7 @@ const AllAppointments = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/doctors");
+        const res = await fetch(`${process.env.SERVER_URL}/api/doctors`);
         const allDoctors = await res.json();
         
         // Base validations structured strictly around 'allDoctors' variable response
@@ -43,7 +43,7 @@ const AllAppointments = () => {
     fetchDoctors();
   }, []);
 
-  // Filter logic based on search term
+  // Filter logic based on search 
   const filteredDoctors = doctors.filter((doctor) =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
   );

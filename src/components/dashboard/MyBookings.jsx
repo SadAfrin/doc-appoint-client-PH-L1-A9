@@ -2,25 +2,31 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { fetchProtected } from "@/lib/api"; //for jwt
+import { authClient } from "@/lib/auth-client"; 
 
 const MyBookings = ({ user }) => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Modal toggle states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  
-  // Data pointers for targeted mutations
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [bookingIdToDelete, setBookingIdToDelete] = useState(null);
 
   const fetchBookings = useCallback(async () => {
     if (!user?.email) return;
+
     try {
       setIsLoading(true);
-      const res = await fetchProtected(`http://localhost:5000/api/bookings?email=${user.email}`);
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
+
+      const res = await fetch(`${process.env.SERVER_URL}/api/bookings?email=${user.email}`, {
+        headers: {
+          authorization: `Bearer ${tokenData?.token}`,
+          "Content-Type": "application/json"
+        },
+        
+      });
       const data = await res.json();
       
       if (data.success) {
@@ -37,7 +43,6 @@ const MyBookings = ({ user }) => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Stage target configuration for state deletion confirmation
   const triggerCancelConfirmation = (id) => {
     setBookingIdToDelete(id);
     setIsDeleteModalOpen(true);
@@ -45,9 +50,18 @@ const MyBookings = ({ user }) => {
 
   const handleConfirmDelete = async () => {
     if (!bookingIdToDelete) return;
+
     try {
-      const res = await fetchProtected(`http://localhost:5000/api/bookings/${bookingIdToDelete}`, {
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
+
+      const res = await fetch(`${process.env.SERVER_URL}/api/bookings/${bookingIdToDelete}`, {
         method: "DELETE",
+        headers: {
+          authorization: `Bearer ${tokenData?.token}`,
+          "Content-Type": "application/json"
+        },
+        
       });
       const data = await res.json();
 
@@ -70,11 +84,20 @@ const MyBookings = ({ user }) => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetchProtected(`http://localhost:5000/api/bookings/${selectedBooking._id}`, {
+      const { data: tokenData } = await authClient.token();
+      console.log(tokenData);
+
+      const { _id, ...updatedData } = selectedBooking;
+
+      const res = await fetch(`${process.env.SERVER_URL}/api/bookings/${selectedBooking._id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectedBooking),
+        headers: { 
+          "Content-Type": "application/json",
+          authorization: `Bearer ${tokenData?.token}` 
+        },
+        body: JSON.stringify(updatedData),
       });
       const data = await res.json();
 
