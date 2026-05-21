@@ -15,7 +15,7 @@ https://doc-appoint-client-indol.vercel.app/
 ## 🛠 Technology Stack
 * **Frontend:** Next.js (App Router), Tailwind CSS, Framer Motion, React Toastify.
 * **Backend:** Node.js, Express.js.
-* **Database:** MongoDB (with Mongoose).
+* **Database:** MongoDB.
 * **Authentication:** Better Auth (JWT + Google Provider).
 * **Deployment:** Vercel (Client) & Render (Server).
 
