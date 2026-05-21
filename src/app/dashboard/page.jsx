@@ -8,6 +8,12 @@ import MyBookings from "@/components/dashboard/MyBookings";
 import MyProfile from "@/components/dashboard/MyProfile";
 import AddDoctor from "@/components/dashboard/AddDoctor"; // Importing the admin form component
 
+export const metadata = {
+  title: "Dashboard | Doctor Appointment",
+  description: "Book your doctor appointment easily.",
+};
+
+
 const DashboardPage = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();

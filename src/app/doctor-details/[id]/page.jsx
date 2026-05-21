@@ -4,6 +4,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  return {
+    title: `Doctor Profile | ${id}`, 
+    description: "Detailed profile and information of the selected doctor.",
+  };
+}
+
 const DoctorDetails = () => {
   const { id } = useParams();
   const router = useRouter();

@@ -4,6 +4,12 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client"; 
 
+export const metadata = {
+  title: "Book Appointment | Doctor Appointment",
+  description: "Secure your appointment slot with the selected doctor.",
+};
+
+
 // dammy data
 const mockDoctors = [
   {

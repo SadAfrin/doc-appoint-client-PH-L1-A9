@@ -9,6 +9,11 @@ import { HiMail, HiLockClosed } from "react-icons/hi";
 import { FaHeartbeat } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client"; 
 
+export const metadata = {
+  title: "Login | Doctor Appointment",
+  description: "Book your doctor appointment easily.",
+};
+
 const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -10,6 +10,12 @@ import { FaHeartbeat } from "react-icons/fa";
 // Importing the exact authClient according to your file export setup
 import { authClient } from "@/lib/auth-client"; 
 
+
+export const metadata = {
+  title: "Register | Doctor Appointment",
+  description: "Book your doctor appointment easily.",
+};
+
 const RegisterContent = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
