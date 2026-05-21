@@ -19,12 +19,13 @@ const Navbar = () => {
   // Handle secure user sign-out session destruction
   const handleLogout = async () => {
     try {
-      console.log("Logging out server session...");
+      // console.log("Logging out server session...");
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
             toast.success("Logged out successfully.");
-            router.push("/login");
+            // router.push("/login");
+            window.location.href = "/login";
           }
         }
       });
