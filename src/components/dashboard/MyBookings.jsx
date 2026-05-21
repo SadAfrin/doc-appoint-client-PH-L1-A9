@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
+import { fetchProtected } from "@/lib/api"; //for jwt
 
 const MyBookings = ({ user }) => {
   const [bookings, setBookings] = useState([]);
@@ -19,7 +20,7 @@ const MyBookings = ({ user }) => {
     if (!user?.email) return;
     try {
       setIsLoading(true);
-      const res = await fetch(`http://localhost:5000/api/bookings?email=${user.email}`);
+      const res = await fetchProtected(`http://localhost:5000/api/bookings?email=${user.email}`);
       const data = await res.json();
       
       if (data.success) {
@@ -45,7 +46,7 @@ const MyBookings = ({ user }) => {
   const handleConfirmDelete = async () => {
     if (!bookingIdToDelete) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${bookingIdToDelete}`, {
+      const res = await fetchProtected(`http://localhost:5000/api/bookings/${bookingIdToDelete}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -70,7 +71,7 @@ const MyBookings = ({ user }) => {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${selectedBooking._id}`, {
+      const res = await fetchProtected(`http://localhost:5000/api/bookings/${selectedBooking._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(selectedBooking),

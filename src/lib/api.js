@@ -1,16 +1,22 @@
 import { authClient } from "@/lib/auth-client";
+import { headers } from "next/headers";
 
 export const fetchProtected = async (url, options = {}) => {
-  // token fetch from betterauth
-  const { data: session } = await authClient.useSession();
-  const token = session?.token; 
+  const token = await authClient.getToken({
+    headers: await headers(),
+  });
 
-  const headers = {
+  const headersObj = {
     "Content-Type": "application/json",
     ...options.headers,
+  };
+
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headersObj["Authorization"] = `Bearer ${token}`;
   }
 
-  return fetch(url, { ...options, headers });
+  return fetch(url, {
+    ...options,
+    headers: headersObj,
+  });
 };

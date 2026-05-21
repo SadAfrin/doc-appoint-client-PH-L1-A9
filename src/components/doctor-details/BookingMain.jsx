@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { fetchProtected } from "@/lib/api"; //for jwt
 
 const BookingAppointmentPage = () => {
   const { id } = useParams();
@@ -84,7 +85,7 @@ const BookingAppointmentPage = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetchProtected("http://localhost:5000/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingPayload),
