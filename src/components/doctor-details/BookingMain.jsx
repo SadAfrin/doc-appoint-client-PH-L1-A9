@@ -125,51 +125,129 @@ const BookingAppointmentPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 sm:p-10 flex flex-col items-center justify-center">
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 max-w-3xl w-full overflow-hidden">
+        
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
           <h1 className="text-2xl font-extrabold">Fill Appointment Form</h1>
-          <p className="text-sm text-blue-100 mt-1">Booking with <span className="font-semibold text-white">{doctor.name}</span></p>
+          <p className="text-sm text-blue-100 mt-1">
+            Booking an appointment with <span className="font-semibold underline text-white">{doctor.name}</span>
+          </p>
         </div>
+
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            {/* Account Email Meta Area */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Account Email</label>
-              <input disabled value={userEmail} className="w-full p-3.5 border rounded-xl bg-gray-50 text-gray-400" />
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                Account Email (Read-Only)
+              </label>
+              <input 
+                type="text" 
+                disabled
+                value={userEmail} 
+                className="w-full p-3.5 border border-gray-100 rounded-xl bg-gray-50 text-gray-400 font-medium outline-none cursor-not-allowed"
+              />
             </div>
+
+            {/* Patient Full Name Input */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Patient Name</label>
-              <input type="text" required className="w-full p-3.5 border rounded-xl" onChange={(e) => setPatientName(e.target.value)} />
+              <input 
+                type="text" 
+                placeholder="e.g. Rahim Uddin" 
+                required 
+                className="w-full p-3.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none transition" 
+                onChange={(e) => setPatientName(e.target.value)} 
+              />
             </div>
+
+            {/* Gender Selection Interface Menu */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Gender</label>
-              <select required className="w-full p-3.5 border rounded-xl" onChange={(e) => setGender(e.target.value)}>
+              <select 
+                required 
+                className="w-full p-3.5 border border-gray-200 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none transition" 
+                onChange={(e) => setGender(e.target.value)}
+              >
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
             </div>
+
+            {/* Phone Input Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" required className="w-full p-3.5 border rounded-xl" onChange={(e) => setPhone(e.target.value)} />
+              <input 
+                type="tel" 
+                placeholder="e.g. 01712345678" 
+                required 
+                className="w-full p-3.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none transition" 
+                onChange={(e) => setPhone(e.target.value)} 
+              />
             </div>
+
+            {/* Calendar Booking Date Target */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-              <input type="date" required className="w-full p-3.5 border rounded-xl" onChange={(e) => setAppointmentDate(e.target.value)} />
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Appointment Date</label>
+              <input 
+                type="date" 
+                required 
+                className="w-full p-3.5 border border-gray-200 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none transition" 
+                onChange={(e) => setAppointmentDate(e.target.value)} 
+              />
             </div>
+
+            {/* Dynamic Appointment Time Slot String Evaluation Target */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Preferred Time (e.g., 10:30 AM)</label>
-              <input type="text" required className={`w-full p-3.5 border rounded-xl ${timeError ? "border-red-500" : ""}`} onChange={(e) => setAppointmentTime(e.target.value)} />
-              {timeError && <p className="text-red-500 text-xs mt-1.5">⚠️ {timeError}</p>}
-              <p className="text-gray-400 text-xs mt-1">Available: {doctor.availability.join(" | ")}</p>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Preferred Time (e.g., 10:30 AM)
+              </label>
+              <input 
+                type="text" 
+                placeholder="e.g. 10:30 AM" 
+                required 
+                className={`w-full p-3.5 border rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:ring-2 outline-none transition ${
+                  timeError ? "border-red-500 focus:ring-red-500" : "border-gray-200 focus:ring-blue-500"
+                }`} 
+                onChange={(e) => setAppointmentTime(e.target.value)} 
+              />
+              {/* Contextual Alert Messaging Interface Block */}
+              {timeError && (
+                <p className="text-red-500 text-xs font-medium mt-1.5 leading-normal animate-shake">
+                  ⚠️ {timeError}
+                </p>
+              )}
+              <p className="text-gray-400 text-xs mt-1">
+                Doctor availability schedules: {doctor.availability.join(" | ")}
+              </p>
             </div>
+
           </div>
-          <div className="bg-gray-50 p-4 rounded-2xl flex justify-between items-center text-sm font-bold">
-            <span>Consultation Fee</span>
-            <span className="text-lg">{doctor.fee} BDT</span>
+
+          {/* Pricing Row Deck */}
+          <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex justify-between items-center text-sm">
+            <span className="text-gray-500 font-semibold">Consultation Fee</span>
+            <span className="font-extrabold text-gray-900 text-lg">{doctor.fee} BDT</span>
           </div>
+
+          {/* Action Trigger Components Row */}
           <div className="flex gap-4 pt-2">
-            <button type="button" onClick={() => router.back()} className="flex-1 bg-gray-100 py-3.5 rounded-xl font-bold">Cancel</button>
-            <button type="submit" className="flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold">Confirm Booking</button>
+             <button 
+               type="button" 
+               onClick={() => router.back()} 
+               className="flex-1 bg-gray-100 text-gray-700 py-3.5 rounded-xl font-bold hover:bg-gray-200 transition text-center"
+             >
+               Cancel
+             </button>
+             <button 
+               type="submit" 
+               className="flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-extrabold hover:bg-blue-700 shadow-sm transition text-center"
+             >
+               Confirm Booking
+             </button>
           </div>
         </form>
       </div>
