@@ -60,7 +60,8 @@ const RegisterContent = () => {
     } else {
       toast.success("Registration Successful! Please login.");
       event.target.reset();
-      router.push("/login"); 
+      //router.push("/login"); 
+      window.location.href = "/login";
     }
     setLoading(false);
   };

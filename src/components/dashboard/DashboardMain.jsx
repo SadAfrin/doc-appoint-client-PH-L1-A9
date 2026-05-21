@@ -28,16 +28,18 @@ const DashboardPage = () => {
     if (!user) {
       toast.error("Unauthorized! Please login to access the dashboard.");
       router.push("/login");
-      return; // Stop further execution
+      return;
     }
     
     // 3. If user exists, safely set the active tab according to role metrics
-    if (user.email === ADMIN_EMAIL) {
-      setActiveTab("add-doctor");
-    } else {
-      setActiveTab("bookings");
-    }
-  }, [user, isPending, router, ADMIN_EMAIL]);
+    if (activeTab === "") {
+        if (user.email === ADMIN_EMAIL) {
+          setActiveTab("add-doctor");
+        } else {
+          setActiveTab("bookings");
+        }
+      }
+    }, [user, isPending, router, ADMIN_EMAIL, activeTab]);
 
   if (isPending || !user) {
     return (
