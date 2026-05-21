@@ -22,7 +22,7 @@ const AllAppointments = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch(`${process.env.SERVER_URL}/api/doctors`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors`);
         const allDoctors = await res.json();
         
         // Base validations structured strictly around 'allDoctors' variable response

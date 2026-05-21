@@ -75,7 +75,7 @@ const AddDoctor = () => {
         },
       };
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/doctors/add`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

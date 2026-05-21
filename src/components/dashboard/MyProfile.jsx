@@ -32,7 +32,7 @@ const UserProfile = () => {
       //     return; 
       // }
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/users/update-profile`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/update-profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

@@ -27,7 +27,7 @@ const BookingAppointmentPage = () => {
         const { data: tokenData } = await authClient.token();
         console.log(tokenData);
 
-        const res = await fetch(`${process.env.SERVER_URL}/api/doctors/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors/${id}`, {
           headers: {
             authorization: `Bearer ${tokenData?.token}`,
             "Content-Type": "application/json"
@@ -92,7 +92,7 @@ const BookingAppointmentPage = () => {
         appointmentTime,
       };
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/bookings`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

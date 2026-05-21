@@ -20,7 +20,7 @@ const MyBookings = ({ user }) => {
       const { data: tokenData } = await authClient.token();
       console.log(tokenData);
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/bookings?email=${user.email}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookings?email=${user.email}`, {
         headers: {
           authorization: `Bearer ${tokenData?.token}`,
           "Content-Type": "application/json"
@@ -55,7 +55,7 @@ const MyBookings = ({ user }) => {
       const { data: tokenData } = await authClient.token();
       console.log(tokenData);
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/bookings/${bookingIdToDelete}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookings/${bookingIdToDelete}`, {
         method: "DELETE",
         headers: {
           authorization: `Bearer ${tokenData?.token}`,
@@ -91,7 +91,7 @@ const MyBookings = ({ user }) => {
 
       const { _id, ...updatedData } = selectedBooking;
 
-      const res = await fetch(`${process.env.SERVER_URL}/api/bookings/${selectedBooking._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookings/${selectedBooking._id}`, {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",

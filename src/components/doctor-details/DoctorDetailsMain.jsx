@@ -18,7 +18,7 @@ const DoctorDetails = () => {
         const { data: tokenData } = await authClient.token();
         console.log(tokenData);
 
-        const res = await fetch(`${process.env.SERVER_URL}/api/doctors/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors/${id}`, {
           headers: {
             authorization: `Bearer ${tokenData?.token}`,
             "Content-Type": "application/json"
