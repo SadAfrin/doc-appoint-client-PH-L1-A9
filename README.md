@@ -2,7 +2,7 @@
 
 **DocAppoint** is a comprehensive Doctor Appointment Booking System designed to bridge the gap between patients and healthcare professionals. Users can browse, search, and book appointments securely with a seamless dashboard experience.
 
-🌐 **Live Site:** [doc-appoint-client-indol.vercel.app](https://doc-appoint-client-indol.vercel.app/)
+🌐 **Live Site:** [doc-appoint-client-indol.vercel.app](https://doc-appoint-client-indol.vercel.app/) | **Server API:** [https://doc-appoint-server-zeta.vercel.app/](https://doc-appoint-server-zeta.vercel.app/)
 
 ---
 
